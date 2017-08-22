@@ -29,6 +29,7 @@
 #include <errno.h>
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <sys/_system_properties.h>
+#include <android-base/properties.h>
 
 #include "init.h"
 #include "vendor_init.h"
@@ -68,10 +69,11 @@ void gsm_properties()
     property_set("ro.telephony.default_network", "9");
 }
 
+namespace android {
+namespace init {
 void vendor_load_properties()
 {
     std::string platform = "";
-    std::string model = "";
     FILE  *fp = NULL;
     char  *board_info = NULL;
     char  *override = NULL;
@@ -84,7 +86,7 @@ void vendor_load_properties()
     };
     int detected_model = wx_unknown;
 
-    platform = property_get("ro.board.platform");
+    platform = android::base::GetProperty("ro.board.platform", "");
     if (strncmp(platform.c_str(), ANDROID_TARGET, PROP_VALUE_MAX))
         return;
 
@@ -105,11 +107,6 @@ void vendor_load_properties()
                 detected_model = wx_un_do;
             else if (!strncmp(override, "wx_un_mo", PROP_VALUE_MAX))
                 detected_model = wx_un_mo;
-
-            if (detected_model == wx_unknown)
-                ERROR("Invalid model override value given: %s\n", override);
-            else
-                ERROR("Overriding device model to %s\n", override);
 
             free(override);
         }
@@ -168,9 +165,9 @@ void vendor_load_properties()
     property_override("ro.build.product", "shieldtablet");
     property_override("ro.product.device", "shieldtablet");
     property_override("ro.product.model", "SHIELD Tablet");
-    model = property_get("ro.product.name");
-    ERROR("Setting build properties for %s model\n", model.c_str());
 }
+}  // namespace init
+}  // namespace android
 
 int vendor_handle_control_message(const std::string &msg, const std::string &arg)
 {
@@ -186,8 +183,6 @@ int vendor_handle_control_message(const std::string &msg, const std::string &arg
             sf_svc->Stop();
             sf_svc->Start();
             zg_svc->Start();
-        } else {
-            ERROR("Required services not found to toggle console mode");
         }
 
         return 0;
