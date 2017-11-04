@@ -114,3 +114,7 @@ PRODUCT_PACKAGES += \
 
 # Radio Interface
 PRODUCT_PACKAGES += rild
+
+# HIDL
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/manifest.xml:system/vendor/manifest.xml
