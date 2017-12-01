@@ -28,6 +28,8 @@
 #include "init_shield.h"
 #include "service_shield.h"
 
+namespace android {
+namespace init {
 void vendor_load_properties()
 {
 	// ATM there is no know way to differentiate between wx_na_wf and sb_na_wf or wx_na_wf and wx_un_do. Little is known of wx_un_mo either.
@@ -47,3 +49,5 @@ int vendor_handle_control_message(const std::string &msg, const std::string &arg
 {
     return shield_handle_control_message(msg, arg);
 }
+}  // namespace init
+}  // namespace android
